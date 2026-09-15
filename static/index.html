@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard MVP - DrFreeze</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <!-- Biblioteca Chart.js para o gráfico -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <!-- TELA DE LOGIN (Simulação) -->
+    <div id="login-screen" class="container">
+        <h2>🔒 Acesso ao Dashboard</h2>
+        <input type="text" id="username" placeholder="Usuário (admin)">
+        <input type="password" id="password" placeholder="Senha (admin123)">
+        <button onclick="fazerLogin()">Entrar</button>
+        <p id="login-error" class="error"></p>
+    </div>
+
+    <!-- TELA DO DASHBOARD (Oculta inicialmente) -->
+    <div id="dashboard-screen" class="container hidden">
+        <header>
+            <h1>🌡️ Monitoramento de Temperatura - DrFreeze</h1>
+            <button onclick="fazerLogout()" class="logout-btn">Sair</button>
+        </header>
+        
+        <div class="stats">
+            <div class="card">
+                <h3>Última Leitura</h3>
+                <p id="ultima-temp">-- °C</p>
+            </div>
+            <div class="card highlight">
+                <h3>Temperatura Média</h3>
+                <p id="temp-media">-- °C</p>
+            </div>
+            <div class="card">
+                <h3>Status do Sistema</h3>
+                <p class="status-ok">🟢 Online</p>
+            </div>
+        </div>
+
+        <!-- Nova seção: Últimas 5 Leituras -->
+        <div class="ultimas-leituras">
+            <h3>📋 Últimas 5 Leituras</h3>
+            <table id="tabela-leituras">
+                <thead>
+                    <tr>
+                        <th>Data/Hora</th>
+                        <th>Temperatura</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Preenchido via JavaScript -->
+                </tbody>
+            </table>
+        </div>
+
+        <div class="chart-container">
+            <canvas id="tempChart"></canvas>
+        </div>
+        <p class="update-info">Atualizando a cada 15 segundos...</p>
+    </div>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>
