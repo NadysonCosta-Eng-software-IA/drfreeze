@@ -3,66 +3,158 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard MVP - DrFreeze</title>
+    <title>DrFreeze - Sistema IoT</title>
     <link rel="stylesheet" href="/static/style.css">
-    <!-- Biblioteca Chart.js para o gráfico -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 </head>
 <body>
 
-    <!-- TELA DE LOGIN (Simulação) -->
-    <div id="login-screen" class="container">
-        <h2>🔒 Acesso ao Dashboard</h2>
-        <input type="text" id="username" placeholder="Usuário (admin)">
-        <input type="password" id="password" placeholder="Senha (admin123)">
+<!-- TELA DE LOGIN -->
+<div id="login-screen" class="login-container">
+    <div class="login-box">
+        <h1>🌡️ DrFreeze</h1>
+        <p>Sistema de Monitoramento IoT</p>
+        <input type="text" id="username" placeholder="Usuário">
+        <input type="password" id="password" placeholder="Senha">
         <button onclick="fazerLogin()">Entrar</button>
         <p id="login-error" class="error"></p>
     </div>
+</div>
 
-    <!-- TELA DO DASHBOARD (Oculta inicialmente) -->
-    <div id="dashboard-screen" class="container hidden">
-        <header>
-            <h1>🌡️ Monitoramento de Temperatura - DrFreeze</h1>
-            <button onclick="fazerLogout()" class="logout-btn">Sair</button>
-        </header>
+<!-- SISTEMA PRINCIPAL -->
+<div id="app" class="app-container hidden">
+    
+    <!-- MENU LATERAL -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>🌡️ DrFreeze</h2>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="#" class="nav-item active" data-page="dashboard">
+                <span class="icon">📊</span> Dashboard
+            </a>
+            <a href="#" class="nav-item" data-page="dispositivos">
+                <span class="icon">📡</span> Dispositivos
+            </a>
+            <a href="#" class="nav-item" data-page="cadastro">
+                <span class="icon">➕</span> Cadastrar Novo
+            </a>
+            <a href="#" class="nav-item" data-page="alertas">
+                <span class="icon">🔔</span> Alertas
+            </a>
+            <a href="#" class="nav-item" data-page="config-wifi">
+                <span class="icon">📶</span> Config Wi-Fi
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <button onclick="fazerLogout()" class="logout-btn">🚪 Sair</button>
+        </div>
+    </aside>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="main-content">
         
-        <div class="stats">
-            <div class="card">
-                <h3>Última Leitura</h3>
-                <p id="ultima-temp">-- °C</p>
+        <!-- PÁGINA: DASHBOARD -->
+        <div id="page-dashboard" class="page active">
+            <h1>Dashboard</h1>
+            <div class="stats">
+                <div class="card">
+                    <h3>Total de Dispositivos</h3>
+                    <p id="total-dispositivos">0</p>
+                </div>
+                <div class="card highlight">
+                    <h3>Online Agora</h3>
+                    <p id="total-online">0</p>
+                </div>
+                <div class="card alert">
+                    <h3>Em Alerta</h3>
+                    <p id="total-alertas">0</p>
+                </div>
             </div>
-            <div class="card highlight">
-                <h3>Temperatura Média</h3>
-                <p id="temp-media">-- °C</p>
-            </div>
-            <div class="card">
-                <h3>Status do Sistema</h3>
-                <p class="status-ok">🟢 Online</p>
+            <div class="chart-container">
+                <h3>Últimas Leituras</h3>
+                <canvas id="tempChart"></canvas>
             </div>
         </div>
 
-        <!-- Nova seção: Últimas 5 Leituras -->
-        <div class="ultimas-leituras">
-            <h3>📋 Últimas 5 Leituras</h3>
-            <table id="tabela-leituras">
-                <thead>
-                    <tr>
-                        <th>Data/Hora</th>
-                        <th>Temperatura</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Preenchido via JavaScript -->
-                </tbody>
-            </table>
+        <!-- PÁGINA: DISPOSITIVOS -->
+        <div id="page-dispositivos" class="page">
+            <h1>Meus Dispositivos</h1>
+            <div id="lista-dispositivos" class="dispositivos-grid">
+                <!-- Preenchido via JS -->
+            </div>
         </div>
 
-        <div class="chart-container">
-            <canvas id="tempChart"></canvas>
+        <!-- PÁGINA: CADASTRO -->
+        <div id="page-cadastro" class="page">
+            <h1>Cadastrar Novo Dispositivo</h1>
+            <div class="form-container">
+                <div class="form-group">
+                    <label>Device ID (único):</label>
+                    <input type="text" id="cad-device-id" placeholder="Ex: DRFREEZE-0042">
+                </div>
+                <div class="form-group">
+                    <label>Nome do Setor:</label>
+                    <input type="text" id="cad-setor" placeholder="Ex: Câmara Fria de Vacinas">
+                </div>
+                <div class="form-group">
+                    <label>Nome/Código do Freezer:</label>
+                    <input type="text" id="cad-freezer" placeholder="Ex: FRZ-01">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Temp. Mínima (°C):</label>
+                        <input type="number" id="cad-temp-min" value="2.0" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label>Temp. Máxima (°C):</label>
+                        <input type="number" id="cad-temp-max" value="8.0" step="0.1">
+                    </div>
+                </div>
+                <button onclick="cadastrarDispositivo()">💾 Cadastrar Dispositivo</button>
+                <div id="cadastro-mensagem"></div>
+                
+                <div id="qrcode-container" class="qrcode-section hidden">
+                    <h3>QR Code de Configuração</h3>
+                    <p>Escaneie com o celular quando o ESP32 estiver em modo de configuração:</p>
+                    <div id="qrcode"></div>
+                    <p class="small" id="qrcode-url"></p>
+                </div>
+            </div>
         </div>
-        <p class="update-info">Atualizando a cada 15 segundos...</p>
-    </div>
 
-    <script src="/static/script.js"></script>
+        <!-- PÁGINA: ALERTAS -->
+        <div id="page-alertas" class="page">
+            <h1>Histórico de Alertas</h1>
+            <div id="lista-alertas">
+                <p class="info">Em breve: lista de alertas de temperatura.</p>
+            </div>
+        </div>
+
+        <!-- PÁGINA: CONFIG WI-FI -->
+        <div id="page-config-wifi" class="page">
+            <h1>Configurar Wi-Fi via QR Code</h1>
+            <div class="info-box">
+                <h3>📋 Como funciona:</h3>
+                <ol>
+                    <li>Ligue o ESP32 novo na tomada</li>
+                    <li>Ele criará uma rede Wi-Fi chamada <strong>"DrFreeze_Config"</strong></li>
+                    <li>Conecte seu celular nessa rede</li>
+                    <li>Uma página abrirá automaticamente para configuração</li>
+                    <li>Ou escaneie o QR Code gerado no cadastro</li>
+                </ol>
+            </div>
+            <div class="info-box">
+                <h3>🔧 Status do Firmware:</h3>
+                <p><strong>Em desenvolvimento:</strong> O Captive Portal do ESP32 será implementado na próxima fase.</p>
+                <p>Por enquanto, use o cadastro acima para registrar os dispositivos manualmente.</p>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<script src="/static/script.js"></script>
 </body>
 </html>
